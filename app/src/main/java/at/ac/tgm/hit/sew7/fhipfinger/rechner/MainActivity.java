@@ -6,12 +6,16 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,24 +30,61 @@ public class MainActivity extends AppCompatActivity {
         output.setOnTouchListener((view, motionEvent) -> {
             output.setText("0");
             output.setTextColor(Color.WHITE);
+
             return true;
         } );
+        Spinner spinner = findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.spinner_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.options_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        EditText input1 = findViewById(R.id.editTextNumber);
+        EditText input2 = findViewById(R.id.editTextNumber2);
+        Spinner spinner = findViewById(R.id.spinner);
+        TextView result = findViewById(R.id.textView);
+
+        int id = item.getItemId();
+
+        if(id == R.id.action_reset) {
+            input1.setText("");
+            input2.setText("");
+            result.setText("0");
+            spinner.setSelection(0);
+            return true;
+        } else if(id == R.id.action_info) {
+            Toast.makeText(this, "Version: 1.0, Author: Florian Hipfinger", Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     public void calc(View v) {
         EditText input1 = findViewById(R.id.editTextNumber);
         int number1 = Integer.parseInt(input1.getText().toString());
         EditText input2 = findViewById(R.id.editTextNumber2);
         int number2 = Integer.parseInt(input2.getText().toString());
         int result;
-        RadioGroup rg = findViewById(R.id.radioGroup);
         TextView output = findViewById(R.id.textView);
-        if(rg.getCheckedRadioButtonId() == R.id.radioButton) {
+
+        Spinner spinner = findViewById(R.id.spinner);
+        String rechenart = spinner.getSelectedItem().toString();
+
+        if(rechenart.equals("+")) {
             result = number1+number2;
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton2) {
+        } else if(rechenart.equals("-")) {
             result = number1 - number2;
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton3) {
+        } else if(rechenart.equals("*")) {
             result = number1 * number2;
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton4) {
+        } else if(rechenart.equals("/")) {
             result = number1 / number2;
         }
         else {
@@ -72,41 +113,27 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveCalcType(View v) {
         String c;
-        RadioGroup rg = findViewById(R.id.radioGroup);
-        if(rg.getCheckedRadioButtonId() == R.id.radioButton) {
-            c = "+";
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton2) {
-            c = "-";
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton3) {
-            c = "*";
-        } else if(rg.getCheckedRadioButtonId() == R.id.radioButton4) {
-            c = "/";
-        }
-        else {
-            c = " ";
-        }
+        Spinner spinner = findViewById(R.id.spinner);
+        String rechenart = spinner.getSelectedItem().toString();
         SharedPreferences sp = this.getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-        editor.putString("rechentyp", c);
+        editor.putString("rechentyp", rechenart);
         editor.commit();
         Toast.makeText(this, "Der Rechentyp wurde erfolgreich gespeichert", Toast.LENGTH_SHORT).show();
     }
 
     public void memoryCallButton(View v) {
         SharedPreferences sp = this.getPreferences(MODE_PRIVATE);
+        Spinner spinner = findViewById(R.id.spinner);
         String rechentyp = sp.getString("rechentyp", "+");
-        RadioButton rb1 = findViewById(R.id.radioButton);
-        RadioButton rb2 = findViewById(R.id.radioButton2);
-        RadioButton rb3 = findViewById(R.id.radioButton3);
-        RadioButton rb4 = findViewById(R.id.radioButton4);
         if(rechentyp.equals("+")) {
-            rb1.setChecked(true);
+            spinner.setSelection(0);
         } else if(rechentyp.equals("-")) {
-            rb2.setChecked(true);
+            spinner.setSelection(1);
         } else if(rechentyp.equals("*")) {
-            rb3.setChecked(true);
+            spinner.setSelection(2);
         } else if(rechentyp.equals("/")) {
-            rb4.setChecked(true);
+            spinner.setSelection(3);
         }
     }
 }

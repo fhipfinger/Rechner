@@ -9,4 +9,12 @@
     <string name="button1">Berechnen</string>
     <string name="button2">MS</string>
     <string name="button3">MR</string>
+    <string name="Reset">Reset</string>
+    <string name="Info">Info</string>
+    <string-array name="spinner_array">
+        <item>+</item>
+        <item>-</item>
+        <item>*</item>
+        <item>/</item>
+    </string-array>
 </resources>
